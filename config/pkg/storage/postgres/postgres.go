@@ -13,6 +13,7 @@ type Storage struct {
 }
 
 func New(connStr string) (*Storage, error) {
+	fmt.Println("start DB")
 	const op = "storage.postgres.New"
 
 	slog.Info("opening database", "connStr", connStr)
@@ -28,6 +29,7 @@ func New(connStr string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	slog.Info("Executing table creation query")
 	slog.Info("creating tables")
 	_, err = db.Exec(
 		`CREATE TABLE IF NOT EXISTS url(
@@ -44,4 +46,8 @@ func New(connStr string) (*Storage, error) {
 
 	slog.Info("database initialized successfully")
 	return &Storage{db: db}, nil
+}
+
+func (s *Storage) Close() error {
+	return s.db.Close()
 }

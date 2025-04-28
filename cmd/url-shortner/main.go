@@ -1,12 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"os"
 	"url-shortner/config/pkg/config"
 	"url-shortner/config/pkg/lib/logger/sl"
+	"url-shortner/config/pkg/storage/postgres"
 
 	_ "github.com/lib/pq"
 )
@@ -33,28 +33,26 @@ func main() {
 	log.Info("configuration loaded successfully")
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		dbHost, dbPort, dbUser, dbPassword, dbName)
+		dbHost, dbPort, dbUser, dbPassword, dbName,
+	)
 
-	db, err := sql.Open("postgres", psqlInfo)
+	storage, err := postgres.New(psqlInfo)
 	if err != nil {
 		log.Error("failed to connect to database", sl.Err(err))
 		os.Exit(1)
 	}
-	defer db.Close()
+	defer storage.Close()
 
-	err = db.Ping()
-	if err != nil {
-		log.Error("failed to ping database", sl.Err(err))
-		os.Exit(1)
-	}
+	fmt.Println("finish DB")
 
-	log.Info("successfully connected to database")
+	//log.Info("successfully connected to database")
 
 	// TODO: init outer: chi, "chi render"
-	log.Info("initialization complete, ready to start server")
+	//log.Info("initialization complete, ready to start server")
 
 	// TODO: run server
-	log.Info("server is running")
+	//log.Info("server is running")
+
 }
 
 func setupLogger(env string) *slog.Logger {
